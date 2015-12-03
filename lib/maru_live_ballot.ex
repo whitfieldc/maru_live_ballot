@@ -1,0 +1,2 @@
+defmodule MaruLiveBallot do
+end
