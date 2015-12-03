@@ -27,6 +27,8 @@ defmodule MaruLiveBallot.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [ {:maru, "~> 0.8"} ]
+    [ {:maru, "~> 0.8"},
+      {:rethinkdb, "~> 0.2.0"}
+    ]
   end
 end
