@@ -11,17 +11,22 @@ defmodule MaruLiveBallot do
 end
 
 defmodule MaruLiveBallot.Database do
-  use Rethinkdb.Connection
+  use RethinkDB.Connection
 end
 
 defmodule MaruLiveBallot.API do
   use Maru.Router
+  alias MaruLiveBallot.Database
 
-  import Rethinkdb.Query
+  import RethinkDB.Query
 
   get do
-    table("posts") |> (MaruLiveBallot.Database).run |> IO.inspect
-    json(conn, %{ hello: :world })
+    table("posts")
+      |> IO.inspect
+      |> Database.run
+      # |> IO.inspect
+    # IO.inspect(MaruLiveBallot.Database)
+    text(conn, "hi")
   end
 
   rescue_from :all, as: e do
