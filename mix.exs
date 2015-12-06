@@ -14,7 +14,7 @@ defmodule MaruLiveBallot.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :maru]]
+    [applications: (Mix.env == :dev && [:exsync] || []) ++ [:logger, :maru]]
   end
 
   # Dependencies can be Hex packages:
@@ -28,7 +28,8 @@ defmodule MaruLiveBallot.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [ {:maru, "~> 0.8"},
-      {:rethinkdb, "~> 0.2.0"}
+      {:rethinkdb, "~> 0.2.0"},
+      {:exsync, "~> 0.1", only: :dev}
     ]
   end
 end

@@ -2,11 +2,16 @@ defmodule MaruLiveBallot do
   use Application
 
   def start(_type, _args) do
-    import Supervisor.Spec, warn: false
-
-    children = [ worker(MaruLiveBallot.Database, []) ]
-    opts = [strategy: :one_for_one, name: MaruTodo.Supervisor]
+    import Supervisor.Spec, warn: true
+    children = [
+      # supervisor(MaruLiveBallot.API, []),
+      worker(MaruLiveBallot.Database, [])
+    ]
+    opts = [strategy: :one_for_one, name: MaruLiveBallot.Supervisor]
+    # opts = []
+    IO.puts("starting")
     Supervisor.start_link(children, opts)
+    IO.inspect(Supervisor)
   end
 end
 
@@ -14,20 +19,28 @@ defmodule MaruLiveBallot.Database do
   use RethinkDB.Connection
 end
 
-defmodule MaruLiveBallot.API do
+defmodule MaruLiveBallot.Router.Endpoint do
   use Maru.Router
   alias MaruLiveBallot.Database
 
   import RethinkDB.Query
 
   get do
+    Database.start_link
     table("posts")
       |> IO.inspect
       |> Database.run
-      # |> IO.inspect
+      |> IO.inspect
     # IO.inspect(MaruLiveBallot.Database)
-    text(conn, "hi")
+    text(conn, "live reload")
   end
+end
+
+
+defmodule MaruLiveBallot.API do
+  use Maru.Router
+
+  mount MaruLiveBallot.Router.Endpoint
 
   rescue_from :all, as: e do
     IO.inspect(e)
