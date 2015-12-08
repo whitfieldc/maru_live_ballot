@@ -23,9 +23,9 @@ defmodule MaruLiveBallot.Router.Endpoint do
   use Maru.Router
   alias MaruLiveBallot.Database
 
-  import RethinkDB.Query
+  import RethinkDB.Query, only: [table_create: 1, table: 2, table: 1, insert: 2]
 
-  get do
+  get "/" do
     Database.start_link
     table("posts")
       |> IO.inspect
@@ -34,6 +34,21 @@ defmodule MaruLiveBallot.Router.Endpoint do
     # IO.inspect(MaruLiveBallot.Database)
     text(conn, "live reload")
   end
+
+  post "/ballots" do
+    # Database.start_link
+    # body = fetch_req_body |> body_params
+    body = conn.params
+    # IO.inspect body
+    table("posts")
+      |> insert(body)
+      |> IO.inspect
+      |> Database.run
+      |> IO.inspect
+    json(conn, %{hello: :world})
+  end
+
+
 end
 
 
