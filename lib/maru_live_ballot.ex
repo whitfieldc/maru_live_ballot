@@ -4,7 +4,7 @@ defmodule MaruLiveBallot do
   def start(_type, _args) do
     import Supervisor.Spec, warn: true
     children = [
-      # supervisor(MaruLiveBallot.API, []),
+      supervisor(MaruLiveBallot.API, []),
       worker(MaruLiveBallot.Database, [])
     ]
     opts = [strategy: :one_for_one, name: MaruLiveBallot.Supervisor]
@@ -39,7 +39,8 @@ defmodule MaruLiveBallot.Router.Endpoint do
     # Database.start_link
     # body = fetch_req_body |> body_params
     body = conn.params
-    # IO.inspect body
+    # receive ballot: title/question, options, initial subscription URL
+    # validate input and create autoincremented ID
     table("posts")
       |> insert(body)
       |> IO.inspect
