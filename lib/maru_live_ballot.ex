@@ -35,18 +35,26 @@ defmodule MaruLiveBallot.Router.Endpoint do
     text(conn, "live reload")
   end
 
-  post "/ballots" do
-    # Database.start_link
-    # body = fetch_req_body |> body_params
-    body = conn.params
-    # receive ballot: title/question, options, initial subscription URL
-    # validate input and create autoincremented ID
-    table("posts")
-      |> insert(body)
-      |> IO.inspect
-      |> Database.run
-      |> IO.inspect
-    json(conn, %{hello: :world})
+  namespace :ballots do
+    params do
+      requires :title, type: String
+    end
+
+    post do
+      # Database.start_link
+      # body = fetch_req_body |> body_params
+      body = conn.params
+      IO.puts("title:")
+      IO.inspect(params[:title])
+      # receive ballot: title/question, options, initial subscription URL
+      # validate input and create autoincremented ID
+      table("posts")
+        |> insert(body)
+        |> IO.inspect
+        |> Database.run
+        |> IO.inspect
+      json(conn, %{hello: :world})
+    end
   end
 
 
