@@ -49,16 +49,21 @@ defmodule MaruLiveBallot.Router.Endpoint do
       params_ballot = params[:ballot]
 
       formatted_options = params_ballot.options
-        |> Enum.reduce(%{}, fn(option, new_map) ->
-                              Map.put(new_map, option, 0)
-                            end
-                      )
+        |> Enum.reduce(%{},
+          fn(option, new_map) ->
+            Map.put(new_map, option, 0)
+          end
+        )
 
-      formatted_ballot = %{
-        title: params_ballot.title,
-        subscriptions: params_ballot.subscriptions,
-        options: formatted_options
-      }
+      formatted_ballot = Map.put(params_ballot, :options, formatted_options)
+        |> IO.inspect
+
+      # formatted_ballot = %{
+      #   title: params_ballot.title,
+      #   subscriptions: params_ballot.subscriptions,
+      #   options: formatted_options
+      # }
+
       post = table("posts")
         |> insert(formatted_ballot)
         |> IO.inspect
