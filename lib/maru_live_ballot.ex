@@ -23,7 +23,7 @@ defmodule MaruLiveBallot.Router.Endpoint do
   use Maru.Router
   alias MaruLiveBallot.Database
 
-  import RethinkDB.Query, only: [table_create: 1, table: 2, table: 1, insert: 2]
+  import RethinkDB.Query, only: [table_create: 1, table: 2, table: 1, insert: 2, filter: 2]
 
 
   namespace :ballots do
@@ -31,8 +31,7 @@ defmodule MaruLiveBallot.Router.Endpoint do
       optional :ballot, type: Map do
         requires :title
         requires :subscribe
-        requires :option_one
-        requires :option_two
+        requires :options, type: List
       end
     end
 
@@ -41,15 +40,19 @@ defmodule MaruLiveBallot.Router.Endpoint do
       posts = table("posts")
         |> IO.inspect
         |> Database.run
-      # IO.inspect(MaruLiveBallot.Database)
       json(conn, posts)
     end
 
     post do
-      # curl -H "Content-Type: application/json" -X POST -d '{"title":"what type of bear is best?", "1":"black bear", "2":"grizzly bear", "subscribe":"this is definitely a url"}' http://localhost:8880/ballots | less
+      # curl -H "Content-Type: application/json" -X POST -d '{"ballot": {"title":"what type of bear is best?", "options":["black bear","grizzly bear"], "subscribe":"this is definitely a url"}}' http://localhost:8880/ballots
       # Database.start_link
       # body = fetch_req_body |> body_params
       body = conn.params
+      ballot = %{
+        title:
+        subscriptions: []
+        options: []
+      }
       # receive ballot: title/question, options, initial subscription URL
       # validate input and create autoincremented ID
       post = table("posts")
@@ -57,6 +60,16 @@ defmodule MaruLiveBallot.Router.Endpoint do
         |> IO.inspect
         |> Database.run
       json(conn, post.data)
+    end
+
+    route_param :id do
+      get do
+        ballot = table("posts")
+          |> filter(%{id: params[:id]})
+          |> Database.run
+          |> IO.inspect
+        json(conn, hd(ballot.data))
+      end
     end
   end
 
