@@ -27,13 +27,6 @@ defmodule MaruLiveBallot.Router.Endpoint do
 
 
   namespace :ballots do
-    params do
-      optional :ballot, type: Map do
-        requires :title
-        requires :subscribe
-        requires :options, type: List
-      end
-    end
 
     get do
       Database.start_link
@@ -43,20 +36,19 @@ defmodule MaruLiveBallot.Router.Endpoint do
       json(conn, posts)
     end
 
+    params do
+      group :ballot, type: Map do
+        requires :title
+        requires :subscriptions
+        requires :options, type: List
+      end
+    end
+
     post do
-      # curl -H "Content-Type: application/json" -X POST -d '{"ballot": {"title":"what type of bear is best?", "options":["black bear","grizzly bear"], "subscribe":"this is definitely a url"}}' http://localhost:8880/ballots
-      # Database.start_link
-      # body = fetch_req_body |> body_params
-      body = conn.params
-      ballot = %{
-        title:
-        subscriptions: []
-        options: []
-      }
-      # receive ballot: title/question, options, initial subscription URL
-      # validate input and create autoincremented ID
+      # curl -H "Content-Type: application/json" -X POST -d '{"ballot": {"title":"what type of bear is best?", "options":["black bear","grizzly bear"], "subscriptions":["this is definitely a url"]}}' http://localhost:8880/ballots | less
+      ballot = params[:ballot]
       post = table("posts")
-        |> insert(body)
+        |> insert(ballot)
         |> IO.inspect
         |> Database.run
       json(conn, post.data)
