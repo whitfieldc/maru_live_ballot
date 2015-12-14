@@ -48,21 +48,14 @@ defmodule MaruLiveBallot.Router.Endpoint do
       # curl -H "Content-Type: application/json" -X POST -d '{"ballot": {"title":"what type of bear is best?", "options":["black_bear","grizzly_bear"], "subscriptions":["this is definitely a url"]}}' http://localhost:8880/ballots | less
       params_ballot = params[:ballot]
 
-      formatted_options = params_ballot.options
+      tallies = params_ballot.options
         |> Enum.reduce(%{},
           fn(option, new_map) ->
             Map.put(new_map, option, 0)
           end
         )
 
-      formatted_ballot = Map.put(params_ballot, :options, formatted_options)
-        |> IO.inspect
-
-      # formatted_ballot = %{
-      #   title: params_ballot.title,
-      #   subscriptions: params_ballot.subscriptions,
-      #   options: formatted_options
-      # }
+      formatted_ballot = Map.put(params_ballot, :tallies, tallies)
 
       post = table("posts")
         |> insert(formatted_ballot)
@@ -80,6 +73,8 @@ defmodule MaruLiveBallot.Router.Endpoint do
           |> IO.inspect
         json(conn, hd(ballot.data))
       end
+
+
     end
   end
 
