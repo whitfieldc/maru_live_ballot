@@ -23,12 +23,13 @@ defmodule MaruLiveBallot.Router.Endpoint do
   use Maru.Router
   alias MaruLiveBallot.Database
 
-  import RethinkDB.Query, only: [table_create: 1, table: 2, table: 1, insert: 2, filter: 2]
+  import RethinkDB.Query, only: [table_create: 1, table: 2, table: 1, insert: 2, filter: 2, update: 2]
 
 
   namespace :ballots do
 
     get do
+      IO.inspect(conn)
       Database.start_link
       posts = table("posts")
         |> IO.inspect
@@ -62,7 +63,6 @@ defmodule MaruLiveBallot.Router.Endpoint do
         |> IO.inspect
         |> Database.run
       json(conn, post.data)
-      # json(conn, %{hello: :world})
     end
 
     route_param :id do
@@ -79,7 +79,35 @@ defmodule MaruLiveBallot.Router.Endpoint do
           |> Database.run
 
         options = hd(ballot.data)["options"]
+          # ^^ should be a way to use atom keys here
         json(conn, options)
+      end
+
+      params do
+        requires :vote
+      end
+
+      patch "/tallies" do
+        # curl -H "Content-Type: application/json" -X PATCH -d '{"vote": "grizzly_bear"}' http://localhost:8880/ballots/e5632783-d472-48af-8e82-f271bceb4f8d/tallies | less
+        vote = params[:vote] |> IO.inspect
+
+        ballot = table("posts")
+          |> filter(%{id: params[:id]})
+          |> Database.run
+
+          # ^^ how can I get the update below into the above query
+          # "get" has namespace collision with Maru library
+
+        # ballot.data
+        #   |> hd
+        #   |> update(%{tallies: %{vote: 1}})
+        #   |> Database.run
+        #   |> IO.inspect
+
+        # tallies = hd(ballot.data)["tallies"] |> IO.inspect
+
+        json(conn, %{hello: :dude})
+
       end
 
 
