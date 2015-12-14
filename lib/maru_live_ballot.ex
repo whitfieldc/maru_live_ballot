@@ -70,8 +70,16 @@ defmodule MaruLiveBallot.Router.Endpoint do
         ballot = table("posts")
           |> filter(%{id: params[:id]})
           |> Database.run
-          |> IO.inspect
         json(conn, hd(ballot.data))
+      end
+
+      get "/options" do
+        ballot = table("posts")
+          |> filter(%{id: params[:id]})
+          |> Database.run
+
+        options = hd(ballot.data)["options"]
+        json(conn, options)
       end
 
 
