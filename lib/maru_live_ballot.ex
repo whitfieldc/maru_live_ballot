@@ -23,10 +23,10 @@ defmodule MaruLiveBallot.QueryWrapper do
     import RethinkDB.Query
     alias MaruLiveBallot.Database
 
-  def update_rethink(id, new_params) do
+  def update_rethink(id, choice) do
     ballot = table("posts")
           |> get(id)
-          |> update(new_params)
+          |> update(%{tallies: %{grizzly_bear: 3}})
           |> Database.run
           |> IO.inspect
   end
@@ -104,21 +104,8 @@ defmodule MaruLiveBallot.Router.Endpoint do
         # curl -H "Content-Type: application/json" -X PATCH -d '{"vote": "grizzly_bear"}' http://localhost:8880/ballots/e5632783-d472-48af-8e82-f271bceb4f8d/tallies | less
         vote = params[:vote] |> IO.inspect
 
-        # ballot = table("posts")
-        #   |> update(%{id: params[:id]}, %{title: "what type of bear isn't best"})
-        #   |> Database.run
-        #   |> IO.inspect
 
-        MaruLiveBallot.QueryWrapper.update_rethink(params[:id], %{title: "what type of bear isn't best"})
-
-          # ^^ how can I get the update below into the above query
-          # "get" has namespace collision with Maru library
-
-        # ballot.data
-        #   |> hd
-        #   |> update(%{tallies: %{vote: 1}})
-        #   |> Database.run
-        #   |> IO.inspect
+        MaruLiveBallot.QueryWrapper.update_rethink(params[:id], vote) |> IO.inspect
 
         # tallies = hd(ballot.data)["tallies"] |> IO.inspect
 
