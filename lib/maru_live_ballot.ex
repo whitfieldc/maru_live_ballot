@@ -23,10 +23,13 @@ defmodule MaruLiveBallot.QueryWrapper do
     import RethinkDB.Query
     alias MaruLiveBallot.Database
 
+    require RethinkDB.Lambda
+    import RethinkDB.Lambda
+
   def update_rethink(id, choice) do
     ballot = table("posts")
           |> get(id)
-          |> update(%{tallies: %{grizzly_bear: 3}})
+          |> update(lambda fn (doc) -> %{tallies: %{grizzly_bear: doc["tallies"]["grizzly_bear"] +1}} end)
           |> Database.run
           |> IO.inspect
   end
