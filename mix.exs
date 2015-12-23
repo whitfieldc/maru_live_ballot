@@ -14,7 +14,7 @@ defmodule MaruLiveBallot.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: (Mix.env == :dev && [:exsync] || []) ++ [:logger, :maru, :httpoison, :rethinkdb]]
+    [applications: (Mix.env == :dev && [:exsync] || []) ++ [:logger, :maru, :httpoison, :rethinkdb], mod: {MaruLiveBallot, []}]
   end
 
   # Dependencies can be Hex packages:
