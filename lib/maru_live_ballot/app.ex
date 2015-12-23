@@ -43,7 +43,7 @@ defmodule MaruLiveBallot.Router.Endpoint do
 
     get do
       IO.inspect(conn)
-      Database.start_link
+      # Database.start_link
       posts = table("posts")
         |> IO.inspect
         |> Database.run
@@ -92,7 +92,7 @@ defmodule MaruLiveBallot.Router.Endpoint do
           |> Database.run
 
         options = hd(ballot.data)["options"]
-          # ^^ should be a way to use atom keys here
+          # ^^ should be a way to use atom keys here?
         json(conn, options)
       end
 
