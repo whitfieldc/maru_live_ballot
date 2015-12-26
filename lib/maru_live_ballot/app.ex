@@ -1,17 +1,3 @@
-defmodule MaruLiveBallot.Supervisor do
-  use Supervisor
-
-  def start_link do
-    Supervisor.start_link(__MODULE__, [], name: __MODULE__)
-  end
-
-  def init([]) do
-    [worker(MaruLiveBallot.Database, [])
-    ] |> supervise strategy: :one_for_one
-  end
-  
-end
-
 defmodule MaruLiveBallot.Database do
   use RethinkDB.Connection
 end
@@ -25,7 +11,7 @@ defmodule MaruLiveBallot.QueryWrapper do
 
   def get_all_ballots do
     posts = table("posts")
-      |> IO.inspect
+      # |> IO.inspect
       |> Database.run
   end
 
@@ -44,20 +30,39 @@ defmodule MaruLiveBallot.QueryWrapper do
   end
 
   def update_tally(id, choice) do
-    ballot = table("posts")
+    # ballot = table("posts")
+    #   |> get(id)
+    #   |> update(lambda fn (doc) -> %{tallies: %{grizzly_bear: doc["tallies"]["grizzly_bear"] +1}} end)
+    #   |> Database.run
+    #   |> IO.inspect
+
+    ballot = hd(get_ballot_by_id(id).data) |> IO.inspect
+
+    updated_count = ballot["tallies"]
+      # |> IO.inspect
+      |> Map.update!(choice, fn(val) -> val+1 end)
+      # |> IO.inspect
+
+    updated_ballot = ballot
+      |> Map.update!("tallies", 
+        fn(tallies_map) -> 
+          Map.update!(tallies_map, choice, fn(val) -> val+1 end) 
+        end) 
+      |> IO.inspect
+
+    # create_ballot(updated_ballot)
+    inserted_ballot = table("posts")
       |> get(id)
-      |> update(lambda fn (doc) -> %{tallies: %{grizzly_bear: doc["tallies"]["grizzly_bear"] +1}} end)
+      |> update(%{"tallies" => updated_count})
       |> Database.run
       |> IO.inspect
+
   end
 end
 
 defmodule MaruLiveBallot.Router.Endpoint do
   use Maru.Router
   alias MaruLiveBallot.Database
-
-  # import RethinkDB.Query, only: [table_create: 1, table: 2, table: 1, insert: 2, filter: 2]
-
 
   namespace :ballots do
 
@@ -110,10 +115,10 @@ defmodule MaruLiveBallot.Router.Endpoint do
       end
 
       patch "/tallies" do
-        # curl -H "Content-Type: application/json" -X PATCH -d '{"vote": "grizzly_bear"}' http://localhost:8880/ballots/40226528-f4c3-4b33-9c78-5aa04001b2eb/tallies | less
+        # curl -H "Content-Type: application/json" -X PATCH -d '{"vote": "grizzly_bear"}' http://localhost:8880/ballots/8f657c73-87f8-4e85-9a75-fac4a2b90c0b/tallies | less
         vote = params[:vote] |> IO.inspect
 
-        MaruLiveBallot.QueryWrapper.update_tally(params[:id], vote) |> IO.inspect
+        MaruLiveBallot.QueryWrapper.update_tally(params[:id], vote) # |> IO.inspect
 
         # tallies = hd(ballot.data)["tallies"] |> IO.inspect
 
