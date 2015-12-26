@@ -1,16 +1,16 @@
-defmodule MaruLiveBallot.Supervisor do
-  use Supervisor
+# defmodule MaruLiveBallot.Supervisor do
+#   use Supervisor
 
-  def start_link do
-    Supervisor.start_link(__MODULE__, [], name: __MODULE__)
-  end
+#   def start_link do
+#     Supervisor.start_link(__MODULE__, [], name: __MODULE__)
+#   end
 
-  def init([]) do
-    [worker(MaruLiveBallot.Database, [])
-    ] |> supervise strategy: :one_for_one
-  end
+#   def init([]) do
+#     [worker(MaruLiveBallot.Database, [])
+#     ] |> supervise strategy: :one_for_one
+#   end
   
-end
+# end
 
 defmodule MaruLiveBallot.Database do
   use RethinkDB.Connection
@@ -110,7 +110,7 @@ defmodule MaruLiveBallot.Router.Endpoint do
       end
 
       patch "/tallies" do
-        # curl -H "Content-Type: application/json" -X PATCH -d '{"vote": "grizzly_bear"}' http://localhost:8880/ballots/40226528-f4c3-4b33-9c78-5aa04001b2eb/tallies | less
+        # curl -H "Content-Type: application/json" -X PATCH -d '{"vote": "grizzly_bear"}' http://localhost:8880/ballots/8f657c73-87f8-4e85-9a75-fac4a2b90c0b/tallies | less
         vote = params[:vote] |> IO.inspect
 
         MaruLiveBallot.QueryWrapper.update_tally(params[:id], vote) |> IO.inspect
