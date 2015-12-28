@@ -39,23 +39,12 @@ defmodule MaruLiveBallot.QueryWrapper do
     ballot = hd(get_ballot_by_id(id).data) |> IO.inspect
 
     updated_count = ballot["tallies"]
-      # |> IO.inspect
       |> Map.update!(choice, fn(val) -> val+1 end)
-      # |> IO.inspect
 
-    updated_ballot = ballot
-      |> Map.update!("tallies", 
-        fn(tallies_map) -> 
-          Map.update!(tallies_map, choice, fn(val) -> val+1 end) 
-        end) 
-      |> IO.inspect
-
-    # create_ballot(updated_ballot)
     inserted_ballot = table("posts")
       |> get(id)
       |> update(%{"tallies" => updated_count})
       |> Database.run
-      |> IO.inspect
 
   end
 end
