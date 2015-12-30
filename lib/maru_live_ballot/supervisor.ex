@@ -6,7 +6,11 @@ defmodule MaruLiveBallot.Supervisor do
   end
 
   def init([]) do
-    [worker(MaruLiveBallot.Database, [])
+    [worker(MaruLiveBallot.Database, []),
+     worker(
+     	MaruLiveBallot.Changefeed, 
+     	[MaruLiveBallot.Database, [name: MaruLiveBallot.Changefeed]]
+     )
     ] |> supervise strategy: :one_for_one
   end
   

@@ -2,7 +2,37 @@ defmodule MaruLiveBallot.Database do
   use RethinkDB.Connection
 end
 
+defmodule MaruLiveBallot.Changefeed do
+  use RethinkDB.Changefeed
 
+  import RethinkDB.Query
+
+  def start_link(opts, gen_server_opts \\[]) do
+    RethinkDB.Changefeed.start_link(__MODULE__, opts, gen_server_opts)
+  end
+
+  def init(db) do
+    q = table("posts")
+      # |> limit(10)
+      |> changes()
+    {:subscribe, q, db, nil}
+  end
+
+  def handle_update(data, nil) do
+    IO.puts('hello change')
+    IO.inspect(data)
+    {:next, data}
+  end
+
+  def handle_update(updates, list) do
+    IO.puts('HELLO change')
+    IO.inspect(updates)
+    IO.inspect('hello list:')
+    IO.inspect(list)
+    {:next, list}
+  end
+
+end
 
 defmodule MaruLiveBallot.Router.Endpoint do
   use Maru.Router
@@ -60,7 +90,7 @@ defmodule MaruLiveBallot.Router.Endpoint do
 
       patch "/tallies" do
         # curl -H "Content-Type: application/json" -X PATCH -d '{"vote": "grizzly_bear"}' http://localhost:8880/ballots/8f657c73-87f8-4e85-9a75-fac4a2b90c0b/tallies | less
-        vote = params[:vote] |> IO.inspect
+        vote = params[:vote] #|> IO.inspect
 
         QueryWrapper.update_tally(params[:id], vote) # |> IO.inspect
 

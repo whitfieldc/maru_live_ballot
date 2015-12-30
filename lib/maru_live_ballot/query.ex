@@ -32,7 +32,7 @@ defmodule MaruLiveBallot.QueryWrapper do
     #   |> Database.run
     #   |> IO.inspect
 
-    ballot = hd(get_ballot_by_id(id).data) |> IO.inspect
+    ballot = hd(get_ballot_by_id(id).data) #|> IO.inspect
 
     updated_count = ballot["tallies"]
       |> Map.update!(choice, fn(val) -> val+1 end)
