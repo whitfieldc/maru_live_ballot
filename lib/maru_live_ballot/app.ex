@@ -27,9 +27,17 @@ defmodule MaruLiveBallot.Changefeed do
   def handle_update(updates, list) do
     IO.puts('HELLO change')
     IO.inspect(updates)
-    IO.inspect('hello list:')
-    IO.inspect(list)
-    {:next, list}
+    old_tallies = hd(updates)["old_val"]["tallies"] |> IO.inspect
+    case hd(updates)["new_val"]["tallies"] do
+      old_tallies ->
+        IO.puts('broadcast the update')
+        IO.inspect(hd(updates)["new_val"]["tallies"])
+        {:next, list}
+      _ ->
+        IO.puts('no new votes')
+        {:next, list}
+    end
+    # {:next, list}
   end
 
 end
