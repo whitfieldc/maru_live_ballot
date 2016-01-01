@@ -22,7 +22,21 @@ defmodule MaruLiveBallot.QueryWrapper do
     ballot = table("posts")
       |> filter(%{id: id_to_get})
       |> Database.run
-    # ballot
+  end
+
+  def add_subscriber(id, url) do
+    # ballot = hd(get_ballot_by_id(id).data)
+    url |> IO.inspect
+
+    ballot = table("posts")
+      |> get(id)
+      # |> IO.inspect
+      |> update(lambda fn(doc) -> %{subscriptions: append(doc["subscriptions"], url)} end)
+      # |> append(doc["subscriptions"], url)
+      # |> IO.inspect
+      |> Database.run
+      |> IO.inspect
+
   end
 
   def update_tally(id, choice) do
