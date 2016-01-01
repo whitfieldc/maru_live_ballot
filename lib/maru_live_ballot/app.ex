@@ -93,6 +93,18 @@ defmodule MaruLiveBallot.Router.Endpoint do
       end
 
       params do
+        requires :subscriber
+      end
+
+      post "/subscriptions" do
+        # curl -H "Content-Type: application/json" -X POST -d '{"subscriber": "grizzly_bear"}' http://localhost:8880/ballots/8f657c73-87f8-4e85-9a75-fac4a2b90c0b/subscriptions | less
+        ballot = QueryWrapper.add_subscriber(params[:id], params[:subscriber])
+
+        json(conn, %{hello: :new_subscriber})
+
+      end
+
+      params do
         requires :vote
       end
 
