@@ -26,21 +26,21 @@ defmodule MaruLiveBallot.QueryWrapper do
   end
 
   def update_tally(id, choice) do
-    # ballot = table("posts")
-    #   |> get(id)
-    #   |> update(lambda fn (doc) -> %{tallies: %{grizzly_bear: doc["tallies"]["grizzly_bear"] +1}} end)
-    #   |> Database.run
-    #   |> IO.inspect
-
-    ballot = hd(get_ballot_by_id(id).data) #|> IO.inspect
-
-    updated_count = ballot["tallies"]
-      |> Map.update!(choice, fn(val) -> val+1 end)
-
-    inserted_ballot = table("posts")
+    ballot = table("posts")
       |> get(id)
-      |> update(%{"tallies" => updated_count})
+      |> update(lambda fn (doc) -> %{tallies: %{choice => doc["tallies"][choice] +1}} end)
       |> Database.run
+      |> IO.inspect
+
+    # ballot = hd(get_ballot_by_id(id).data) #|> IO.inspect
+
+    # updated_count = ballot["tallies"]
+    #   |> Map.update!(choice, fn(val) -> val+1 end)
+
+    # inserted_ballot = table("posts")
+    #   |> get(id)
+    #   |> update(%{"tallies" => updated_count})
+    #   |> Database.run
 
   end
 end
